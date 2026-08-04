@@ -1,6 +1,7 @@
 package me.a8kj.sagittarius.extension;
 
 import de.spacepotato.sagittarius.Sagittarius;
+import de.spacepotato.sagittarius.command.Command;
 import me.a8kj.sagittarius.event.EventBus;
 import me.a8kj.sagittarius.extension.actions.ExtensionActions;
 import org.slf4j.Logger;
@@ -34,9 +35,12 @@ public interface ExtensionContext {
     Logger getLogger();
 
     /**
-     * Gets the default extension actions.
+     * Registers a command with the server.
      *
-     * @return the default actions
+     * @param command the command to register
+     *
+     * @author a8kj7sea
+     * @version 1.2.4
      */
-    ExtensionActions getDefaultActions();
+    void registerCommand(Command command);
 }
