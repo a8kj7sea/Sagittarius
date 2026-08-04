@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Random;
 
 @Slf4j
+@Getter
 public class SagittariusImpl extends Sagittarius {
 
 	public static SagittariusImpl getInstance() {
