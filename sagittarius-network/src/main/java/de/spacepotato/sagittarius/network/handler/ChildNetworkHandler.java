@@ -16,59 +16,61 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class ChildNetworkHandler {
 
-	protected final Channel channel;
-	@Getter
-	protected State state;
-	protected PacketMappings stateMappings;
-	
-	protected ChildNetworkHandler(Channel channel) {
-		this.channel = channel;
-		setState(State.HANDSHAKE);
-	}
-	
-	protected void setState(State state) {
-		this.state = state;
-		this.stateMappings = PacketRegistry.getPackets(state);
-	}
-	
-	public Packet createPacket(int id) {
-		return stateMappings.createPacket(id);
-	}
+    protected final Channel channel;
+    @Getter
+    protected State state;
+    protected PacketMappings stateMappings;
 
-	public void handleError(Throwable throwable) {
-		if (channel.isOpen()) {
-			channel.close();
-		}
-		if (throwable instanceof java.io.IOException ||
-				throwable instanceof io.netty.handler.codec.DecoderException ||
-				throwable instanceof io.netty.handler.timeout.ReadTimeoutException) {
-			log.debug("Connection error ({}): {}", channel.remoteAddress(), throwable.getMessage());
-		} else {
-			log.error("Exception in connection pipeline ({})", channel.remoteAddress(), throwable);
-		}
-	}
+    protected ChildNetworkHandler(Channel channel) {
+        this.channel = channel;
+        setState(State.HANDSHAKE);
+    }
 
-	public void handleDisconnect() {
-		
-	}
+    protected void setState(State state) {
+        this.state = state;
+        this.stateMappings = PacketRegistry.getPackets(state);
+    }
 
-	public abstract void handleHandshake(ClientHandshakePacket packet);
+    public Packet createPacket(int id) {
+        return stateMappings.createPacket(id);
+    }
 
-	public abstract void handleStatusRequest(ClientStatusRequestPacket packet);
+    public void handleError(Throwable throwable) {
+        if (channel.isOpen()) {
+            channel.close();
+        }
+        if (throwable instanceof java.io.IOException ||
+                throwable instanceof io.netty.handler.codec.DecoderException ||
+                throwable instanceof io.netty.handler.timeout.ReadTimeoutException) {
+            log.debug("Connection error ({}): {}", channel.remoteAddress(), throwable.getMessage());
+        } else {
+            log.error("Exception in connection pipeline ({})", channel.remoteAddress(), throwable);
+        }
+    }
 
-	public abstract void handleStatusPing(ClientStatusPingPacket packet);
+    public void handleDisconnect() {
 
-	public abstract void handleLoginStart(ClientLoginStartPacket packet);
+    }
 
-	public abstract void handleKeepAlive(ClientKeepAlivePacket packet);
+    public abstract void handleHandshake(ClientHandshakePacket packet);
 
-	public abstract void handleClientSettings(ClientSettingsPacket packet);
+    public abstract void handleStatusRequest(ClientStatusRequestPacket packet);
 
-	public abstract void handlePosition(ClientPositionPacket packet);
+    public abstract void handleStatusPing(ClientStatusPingPacket packet);
 
-	public abstract void handleLook(ClientLookPacket packet);
+    public abstract void handleLoginStart(ClientLoginStartPacket packet);
 
-	public abstract void handlePositionLook(ClientPositionLookPacket packet);
+    public abstract void handleKeepAlive(ClientKeepAlivePacket packet);
 
-	public abstract void handlePluginMessage(ClientPluginMessagePacket packet);
+    public abstract void handleClientSettings(ClientSettingsPacket packet);
+
+    public abstract void handlePosition(ClientPositionPacket packet);
+
+    public abstract void handleLook(ClientLookPacket packet);
+
+    public abstract void handlePositionLook(ClientPositionLookPacket packet);
+
+    public abstract void handlePluginMessage(ClientPluginMessagePacket packet);
+
+    public abstract void handleChat(ClientChatPacket packet);
 }
