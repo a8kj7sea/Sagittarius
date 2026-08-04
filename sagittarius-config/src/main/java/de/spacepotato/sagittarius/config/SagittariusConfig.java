@@ -260,4 +260,19 @@ public class SagittariusConfig implements LimboConfig {
 		return tomlConfig.getBorder().getWarningBlocks();
 	}
 
+
+	@Override
+	public String getMotd() {
+		return tomlConfig.getServer() != null ? tomlConfig.getServer().getMotd() : "A Sagittarius Limbo Server";
+	}
+
+	@Override
+	public int getMaxPlayers() {
+		return tomlConfig.getServer() != null ? tomlConfig.getServer().getMaxPlayers() : 1;
+	}
+
+	@Override
+	public boolean isCancelMove() {
+		return tomlConfig.getConnect().isCancelMove();
+	}
 }
