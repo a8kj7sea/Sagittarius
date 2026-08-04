@@ -248,4 +248,14 @@ public class LimboChildHandler extends ChildNetworkHandler {
         );
     }
 
+
+    @Override
+    public void handleChat(ClientChatPacket packet) {
+        String message = packet.getMessage();
+        if (message.startsWith("/")) {
+            String command = message.substring(1);
+            SagittariusImpl.getInstance().getCommandHandler().runCommand(player, command);
+        }
+    }
+
 }
