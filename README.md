@@ -63,6 +63,6 @@ It is recommended to start with slightly higher values and only decrease it if a
 Special thanks to:
 - [ViaVersion](https://github.com/ViaVersion/ViaVersion) for making their work on multi-version support accessible under the GPL license so that others can benefit from it as well.
 - [wiki.vg](https://wiki.vg/Main_Page) for sharing their resource on the Minecraft protocol.
-- MrKavatch for playing a major role in the realization of this project.
+- @IDragonRiderI for playing a major role in the realization of this project.
 - Viv2King for contributing configuration improvements and bug fixes.
 - a8kj7ses for the Extension System architecture and performance enhancements.
