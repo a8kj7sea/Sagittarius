@@ -11,7 +11,9 @@ import de.spacepotato.sagittarius.network.protocol.status.ClientStatusPingPacket
 import de.spacepotato.sagittarius.network.protocol.status.ClientStatusRequestPacket;
 import io.netty.channel.Channel;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public abstract class ChildNetworkHandler {
 
 	protected final Channel channel;
@@ -32,9 +34,18 @@ public abstract class ChildNetworkHandler {
 	public Packet createPacket(int id) {
 		return stateMappings.createPacket(id);
 	}
-	
+
 	public void handleError(Throwable throwable) {
-		throwable.printStackTrace();
+		if (channel.isOpen()) {
+			channel.close();
+		}
+		if (throwable instanceof java.io.IOException ||
+				throwable instanceof io.netty.handler.codec.DecoderException ||
+				throwable instanceof io.netty.handler.timeout.ReadTimeoutException) {
+			log.debug("Connection error ({}): {}", channel.remoteAddress(), throwable.getMessage());
+		} else {
+			log.error("Exception in connection pipeline ({})", channel.remoteAddress(), throwable);
+		}
 	}
 
 	public void handleDisconnect() {
@@ -58,5 +69,6 @@ public abstract class ChildNetworkHandler {
 	public abstract void handleLook(ClientLookPacket packet);
 
 	public abstract void handlePositionLook(ClientPositionLookPacket packet);
-	
+
+	public abstract void handlePluginMessage(ClientPluginMessagePacket packet);
 }
