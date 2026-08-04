@@ -37,6 +37,7 @@ public class PacketRegistry {
 		registerPacket(State.PLAY, new ClientSettingsPacket());
 
 		registerPacket(State.PLAY, new ClientPluginMessagePacket());
+		registerPacket(State.PLAY, new ClientChatPacket());
 	}
 	
 	private static void registerPacket(State state, Packet packet) {
