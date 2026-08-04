@@ -252,5 +252,35 @@ public interface LimboConfig {
 	 * @return the world border's warning blocks.
 	 */
 	int getWorldBorderWarningBlocks();
+
+	/**
+	 * Returns the server's Message of the Day (MOTD).
+	 *
+	 * @return The server MOTD string displayed in the server list.
+	 * @author a8kj7sea
+	 * @author viva_k1ng
+	 * @since 1.2.3
+	 */
+	String getMotd();
+
+	/**
+	 * Returns the maximum number of players allowed to connect concurrently.
+	 *
+	 * @return The maximum player capacity.
+	 * @author a8kj7sea
+	 * @author viva_k1ng
+	 * @since 1.2.3
+	 */
+	int getMaxPlayers();
+
+	/**
+	 * Returns whether player movement packets should be canceled/prevented.
+	 *
+	 * @return true if player movement is restricted or canceled.
+	 * @author a8kj7sea
+	 * @author viva_k1ng
+	 * @since 1.2.3
+	 */
+	boolean isCancelMove();
 	
 }
