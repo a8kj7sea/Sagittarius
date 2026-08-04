@@ -17,6 +17,8 @@
 		<module>sagittarius-viaversion</module>
 	</modules>
 
+
+	
 	<properties>
 		<!-- CI-friendly version -->
 		<revision>1.2.3</revision>
@@ -42,6 +44,15 @@
 		<maven.shade.plugin.version>3.5.1</maven.shade.plugin.version>
 		<flatten.plugin.version>1.6.0</flatten.plugin.version>
 	</properties>
+
+
+	<distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/a8kj7sea/Sagittarius</url>
+        </repository>
+    </distributionManagement>
 
 	<dependencyManagement>
 		<dependencies>
