@@ -16,5 +16,6 @@ public class ConnectConfig {
 	
 	private String connectType;
 	private String[] connectPayloadString;
-	
+
+	private boolean cancelMove = true;
 }
