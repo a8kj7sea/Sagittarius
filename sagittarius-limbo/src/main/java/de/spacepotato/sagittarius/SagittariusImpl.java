@@ -21,6 +21,8 @@ import de.spacepotato.sagittarius.scheduler.Scheduler;
 import de.spacepotato.sagittarius.viaversion.SagittariusViaPlatform;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import me.a8kj.sagittarius.event.EventBus;
+import me.a8kj.sagittarius.extension.ExtensionManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,7 +35,12 @@ public class SagittariusImpl extends Sagittarius {
 	public static SagittariusImpl getInstance() {
 		return (SagittariusImpl) instance;
 	}
-	
+
+
+	@Getter
+	private final EventBus eventBus = new EventBus();
+	private ExtensionManager extensionManager;
+
 	private final SagittariusScheduler scheduler;
 	private final SagittariusServerImpl server;
 	private final SagittariusConfig config;
@@ -143,16 +150,19 @@ public class SagittariusImpl extends Sagittarius {
 				getWorldCache().send((PlayerImpl) player);
 			}
 		}
+
+
 	}
 	
 	public void shutdown() {
 		log.info("Shutdown sequence triggered!");
-		
+
+		if (extensionManager != null) extensionManager.disableExtensions();
 		log.info("Stopping scheduler...");
 		scheduler.stopProcessing();
 
 		commandHandler.stopCommandThread();
-		
+
 		log.info("Closing socket...");
 		getServer().stop();
 		SagittariusViaPlatform.destroy();
@@ -183,8 +193,12 @@ public class SagittariusImpl extends Sagittarius {
 		if (getConfig().shouldSendActionbar()) {
 			actionbarTask = scheduler.repeat(this::tickActionbar, getConfig().getActionbarIntervalTicks(), getConfig().getActionbarIntervalTicks());			
 		}
-		
+
+		this.extensionManager = new ExtensionManager(this, eventBus);
+		this.extensionManager.loadExtensions();
+
 		scheduler.startProcessing();
+
 	}
 	
 	private void tickKeepAlive() {
