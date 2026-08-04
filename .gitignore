@@ -1,2 +1,5 @@
 /target/
-/logs/
+/logs/.idea/
+target/
+*.flattened-pom.xml
+dependency-reduced-pom.xml
