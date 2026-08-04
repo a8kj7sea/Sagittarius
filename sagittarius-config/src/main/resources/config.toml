@@ -6,6 +6,11 @@ viaversion = true
 # Change to 0 to use the maximum amount available
 nettyThreads = 4
 
+
+[server]
+motd = "A Sagittarius Limbo Server"
+maxPlayers = 1
+
 [internal]
 # Specifies the delay between keep-alive heartbeats in ticks.
 heartbeatDelay = 100
@@ -53,6 +58,8 @@ connectType = "string"
 # This is the data sent to BungeeCord. 
 # All the strings in here are UTF-8 encoded and stored as array.
 connectPayloadString = ["Connect", "lobby"]
+
+cancelMove = true
 
 # Allows to define messages that will be sent to the player in regular intervals. Use \n for line breaks.
 [messages]
