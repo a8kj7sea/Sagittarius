@@ -23,5 +23,10 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 	public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
 		childHandler.handleDisconnect();
 	}
+
+	@Override
+	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+		childHandler.handleError(cause);
+	}
 	
 }
