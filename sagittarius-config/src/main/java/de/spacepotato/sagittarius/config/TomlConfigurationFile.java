@@ -40,5 +40,6 @@ public class TomlConfigurationFile {
 	private ConnectConfig connect;
 	private MessagesConfig messages;
 	private WorldBorderConfig border;
+	private ServerConfig server;
 	
 }
