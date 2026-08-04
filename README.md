@@ -1,6 +1,6 @@
 # Sagittarius - Standalone Minecraft Limbo
 Sagittarius is a small Minecraft Limbo project which aims to support any version starting from 1.8. This is accomplished by integrating ViaVersion into the server itself.
-Whilst this allows for quick version integration, it also binds us to a few restrictions set by ViaVersion. One of those restrictions is that *Java 17* is required in order to run Sagittarius.
+Whilst this allows for quick version integration, it also binds us to a few restrictions set by ViaVersion. One of those restrictions is that *Java 17* is required in order to run Sagittarius (though the codebase is compiled with Java 1.8 for maximum compatibility).
 The name is inspired by the black hole [Sagittarius A*](https://en.wikipedia.org/wiki/Sagittarius_A*) which is also a slight reference to how limbo servers in general work.
 
 ## Features
@@ -10,9 +10,46 @@ The name is inspired by the black hole [Sagittarius A*](https://en.wikipedia.org
 - [x] Supports BungeeCord IP-Forwarding (incl. Skins)
 - [x] Actionbar support
 - [x] The connection plugin message can be changed
+- [x] Configurable MOTD and Max Players
+- [x] Player movement freeze (`cancelMove`) for non-creative players
+- [x] **Custom Extensions System** (Event-Driven, Strategy Pattern, Isolated ClassLoaders)
+- [x] Proxy Messaging support (Velocity/BungeeCord) for Extensions to communicate with proxies
+
+## Extension System
+Sagittarius now includes a powerful, lightweight Extension API (`me.a8kj.sagittarius.extension`).
+Instead of modifying the core source code, you can now write standalone `.jar` extensions and drop them into the `extensions/` folder.
+- **Event-Driven:** Subscribe to events like `ProxyMessageEvent` using a highly optimized `EventBus`.
+- **Strategy Pattern:** Use default actions (`transferPlayer`, `sendMessage`) or implement your own custom actions.
+- **Isolated:** Each extension runs in its own `URLClassLoader` to prevent conflicts.
+
+### Example Extension
+```java
+public class AuthTransferExtension implements SagittariusExtension {
+    private ExtensionContext context;
+
+    @Override
+    public ExtensionMetadata getMetadata() {
+        return new ExtensionMetadata("AuthTransfer", "1.0.0", "YourName");
+    }
+
+    @Override
+    public void onLoad(ExtensionContext context) {
+        this.context = context;
+    }
+
+    @Override
+    public void onEnable() {
+        context.getEventBus().subscribe(ProxyMessageEvent.class, event -> {
+            if (event.getChannel().equals("Auth:LoginSuccess")) {
+                context.getDefaultActions().transferPlayer(event.getPlayer(), "lobby1");
+            }
+        });
+    }
+}
+```
 
 ## Additional help for modifying the code
-If the default version of Sagittarius does not fit your needs, you can modify the source code according to your needs. In this case you may find the wiki helpful as it contains more resources on that specific topic.
+If the default version of Sagittarius does not fit your needs, you can modify the source code according to your needs or write an Extension. In this case you may find the wiki helpful as it contains more resources on that specific topic.
 
 ## Using a WorldEdit schematic
 During the startup phase, Sagittarius will attempt to load a schematic called "world.schematic".
@@ -27,3 +64,5 @@ Special thanks to:
 - [ViaVersion](https://github.com/ViaVersion/ViaVersion) for making their work on multi-version support accessible under the GPL license so that others can benefit from it as well.
 - [wiki.vg](https://wiki.vg/Main_Page) for sharing their resource on the Minecraft protocol.
 - MrKavatch for playing a major role in the realization of this project.
+- Viv2King for contributing configuration improvements and bug fixes.
+- a8kj7ses for the Extension System architecture and performance enhancements.
