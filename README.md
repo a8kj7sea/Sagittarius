@@ -1,4 +1,7 @@
-# Sagittarius - Standalone Minecraft Limbo
+# Sagittarius-Extended <sup><sub>`Standalone Minecraft Limbo` </sup></sub>
+
+<sup><sub>[![](https://jitpack.io/v/a8kj7sea/Sagittarius-Extended.svg)](https://jitpack.io/#a8kj7sea/Sagittarius-Extended)</sup></sub>
+
 Sagittarius is a small Minecraft Limbo project which aims to support any version starting from 1.8. This is accomplished by integrating ViaVersion into the server itself.
 Whilst this allows for quick version integration, it also binds us to a few restrictions set by ViaVersion. One of those restrictions is that *Java 17* is required in order to run Sagittarius (though the codebase is compiled with Java 1.8 for maximum compatibility).
 The name is inspired by the black hole [Sagittarius A*](https://en.wikipedia.org/wiki/Sagittarius_A*) which is also a slight reference to how limbo servers in general work.
@@ -14,6 +17,7 @@ The name is inspired by the black hole [Sagittarius A*](https://en.wikipedia.org
 - [x] Player movement freeze (`cancelMove`) for non-creative players
 - [x] **Custom Extensions System** (Event-Driven, Strategy Pattern, Isolated ClassLoaders)
 - [x] Proxy Messaging support (Velocity/BungeeCord) for Extensions to communicate with proxies
+- [x] **Built-in Events** (PlayerJoin, PlayerQuit, PlayerMove, PlayerChat, ProxyMessage) ready to use
 
 ## Extension System
 Sagittarius now includes a powerful, lightweight Extension API (`me.a8kj.sagittarius.extension`).
@@ -47,6 +51,40 @@ public class AuthTransferExtension implements SagittariusExtension {
     }
 }
 ```
+
+### Custom Events
+Extensions can define and publish their own custom events using the `EventBus`. To create a custom event, simply implement the `LimboEvent` interface (and `Cancellable` if it should be cancellable).
+
+**1. Define the Event:**
+```java
+public class MyCustomEvent implements LimboEvent {
+    private final String customData;
+
+    public MyCustomEvent(String customData) {
+        this.customData = customData;
+    }
+
+    public String getCustomData() {
+        return customData;
+    }
+}
+```
+
+**2. Publish and Subscribe:**
+You can then publish and listen to this event within your extension:
+```java
+// Publishing the event
+context.getEventBus().publish(new MyCustomEvent("Hello World"));
+
+// Subscribing to the event
+context.getEventBus().subscribe(MyCustomEvent.class, event -> {
+    context.getLogger().info("Received data: " + event.getCustomData());
+});
+```
+
+> [!IMPORTANT] 
+> 
+> Not all Minecraft events can be created or intercepted purely from an extension. Core gameplay events (e.g., specific packet-level interactions, low-level networking, or world modifications) require direct modifications to the internal `LimboChildHandler` or `ChildNetworkHandler` classes in the core Sagittarius source code to be fired properly. The Extension API provides hooks for high-level interactions (Join, Quit, Move, Chat, Proxy Messages).
 
 ## Additional help for modifying the code
 If the default version of Sagittarius does not fit your needs, you can modify the source code according to your needs or write an Extension. In this case you may find the wiki helpful as it contains more resources on that specific topic.
