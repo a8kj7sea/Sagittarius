@@ -5,6 +5,7 @@ import de.spacepotato.sagittarius.Sagittarius;
 import de.spacepotato.sagittarius.SagittariusImpl;
 import de.spacepotato.sagittarius.cache.PacketCache;
 import de.spacepotato.sagittarius.config.LimboConfig;
+import de.spacepotato.sagittarius.entity.Player;
 import de.spacepotato.sagittarius.entity.PlayerImpl;
 import de.spacepotato.sagittarius.mojang.BungeeCordGameProfile;
 import de.spacepotato.sagittarius.mojang.GameProfile;
@@ -28,6 +29,10 @@ import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.a8kj.sagittarius.event.ProxyMessageEvent;
+import me.a8kj.sagittarius.event.player.PlayerChatEvent;
+import me.a8kj.sagittarius.event.player.PlayerJoinEvent;
+import me.a8kj.sagittarius.event.player.PlayerMoveEvent;
+import me.a8kj.sagittarius.event.player.PlayerQuitEvent;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -69,9 +74,22 @@ public class LimboChildHandler extends ChildNetworkHandler {
 
     @Override
     public void handleDisconnect() {
-        if (player == null) {
-            return;
+        if (player == null) return;
+
+        String quitMessage = "§e" + player.getName() + " left the limbo.";
+        PlayerQuitEvent quitEvent = new PlayerQuitEvent(player, quitMessage);
+        SagittariusImpl.getInstance().getEventBus().publish(quitEvent);
+
+        if (!quitEvent.isCancelled() && quitEvent.getQuitMessage() != null) {
+            synchronized (Sagittarius.getInstance().getPlayers()) {
+                for (Player p : Sagittarius.getInstance().getPlayers()) {
+                    if (!p.getUUID().equals(player.getUUID())) {
+                        p.sendMessage(quitEvent.getQuitMessage());
+                    }
+                }
+            }
         }
+
         synchronized (Sagittarius.getInstance().getPlayers()) {
             Sagittarius.getInstance().getPlayers().remove(player);
         }
@@ -169,6 +187,19 @@ public class LimboChildHandler extends ChildNetworkHandler {
             player.sendMessage(config.getJoinMessage());
         }
         log.info(player.getName() + " has logged in.");
+
+
+        String joinMessage = "§e" + player.getName() + " joined the limbo.";
+        PlayerJoinEvent joinEvent = new PlayerJoinEvent(player, joinMessage);
+        SagittariusImpl.getInstance().getEventBus().publish(joinEvent);
+
+        if (!joinEvent.isCancelled() && joinEvent.getJoinMessage() != null) {
+            synchronized (Sagittarius.getInstance().getPlayers()) {
+                for (Player p : Sagittarius.getInstance().getPlayers()) {
+                    p.sendMessage(joinEvent.getJoinMessage());
+                }
+            }
+        }
     }
 
     // ============================================================ \\
@@ -194,6 +225,12 @@ public class LimboChildHandler extends ChildNetworkHandler {
 
     @Override
     public void handlePosition(ClientPositionPacket packet) {
+
+        PlayerMoveEvent moveEvent = new PlayerMoveEvent(player, packet.getX(), packet.getY(), packet.getZ());
+        SagittariusImpl.getInstance().getEventBus().publish(moveEvent);
+
+        if (moveEvent.isCancelled()) return;
+
         boolean freeze = Sagittarius.getInstance().getConfig().isCancelMove() &&
                 Sagittarius.getInstance().getConfig().getGameMode() != GameMode.CREATIVE;
 
@@ -219,6 +256,12 @@ public class LimboChildHandler extends ChildNetworkHandler {
 
     @Override
     public void handlePositionLook(ClientPositionLookPacket packet) {
+
+        PlayerMoveEvent moveEvent = new PlayerMoveEvent(player, packet.getX(), packet.getY(), packet.getZ());
+        SagittariusImpl.getInstance().getEventBus().publish(moveEvent);
+
+        if (moveEvent.isCancelled()) return;
+
         boolean freeze = Sagittarius.getInstance().getConfig().isCancelMove() &&
                 Sagittarius.getInstance().getConfig().getGameMode() != GameMode.CREATIVE;
 
@@ -252,10 +295,19 @@ public class LimboChildHandler extends ChildNetworkHandler {
     @Override
     public void handleChat(ClientChatPacket packet) {
         String message = packet.getMessage();
-        if (message.startsWith("/")) {
-            String command = message.substring(1);
-            SagittariusImpl.getInstance().getCommandHandler().runCommand(player, command);
-        }
+
+        PlayerChatEvent chatEvent = new PlayerChatEvent(player, message);
+        SagittariusImpl.getInstance().getEventBus().publish(chatEvent);
+
+
+        //log.info(player.getName() + " : " + message);
+
+        if (chatEvent.isCancelled()) return;
+
+        if (!message.startsWith("/")) return;
+
+        String command = message.substring(1);
+        SagittariusImpl.getInstance().getCommandHandler().runCommand(player, command);
     }
 
 }
