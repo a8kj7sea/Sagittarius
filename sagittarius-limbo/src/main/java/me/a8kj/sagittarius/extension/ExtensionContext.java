@@ -34,11 +34,18 @@ public interface ExtensionContext {
      */
     Logger getLogger();
 
+
+    /**
+     * Gets the default extension actions.
+     *
+     * @return the default actions
+     */
+    ExtensionActions getDefaultActions();
+
     /**
      * Registers a command with the server.
      *
      * @param command the command to register
-     *
      * @author a8kj7sea
      * @version 1.2.4
      */
